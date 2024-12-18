@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TopMovieList": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Scripts\\GitHub\\alexgit55\\Console.TopMovieList\\TopMovieList\\"
+    }
+  }
+}
