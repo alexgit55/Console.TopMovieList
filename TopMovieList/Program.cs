@@ -7,7 +7,7 @@
             var movieController = new MovieController();
             movieController.CreateDatabase();
 
-            //UserInterface.DisplayMainMenu();
+            UserInterface.DisplayMainMenu();
         }
     }
 }

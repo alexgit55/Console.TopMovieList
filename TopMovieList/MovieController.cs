@@ -25,7 +25,7 @@ namespace TopMovieList
             }
         }
 
-        internal List<Movie> GetMovies()
+        internal List<Movie> GetMovies(string query)
         {
             var movies = new List<Movie>();
 
@@ -34,18 +34,17 @@ namespace TopMovieList
                 using var connection = new SqliteConnection(ConnectionString);
                 connection.Open();
                 var selectCommand = connection.CreateCommand();
-                selectCommand.CommandText = "SELECT * FROM Movies";
+                selectCommand.CommandText = $@"{query}";
                 using var reader = selectCommand.ExecuteReader();
                 while (reader.Read())
                 {
-                    var movie = new Movie
-                    {
-                        Id = reader.GetInt32(0),
-                        Title = reader.GetString(1),
-                        Genre = Enum.Parse<Genre>(reader.GetString(2)),
-                        Status = Enum.Parse<MovieStatus>(reader.GetString(3)),
-                        Length = DateTime.Parse(reader.GetString(4))
-                    };
+                    var id = reader.GetInt32(0);
+                    var movie = new Movie(id);
+                    movie.Title = reader.GetString(1);
+                    movie.Genre = Enum.Parse<Genre>(reader.GetString(2));
+                    movie.Status = Enum.Parse<MovieStatus>(reader.GetString(3));
+                    movie.Length = reader.GetString(4);
+
                     movies.Add(movie);
                 }
             }
@@ -55,5 +54,25 @@ namespace TopMovieList
             }
             return movies;
         }
+
+        internal void AddMovie(Movie movie)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(ConnectionString);
+                connection.Open();
+                var insertCommand = connection.CreateCommand();
+                insertCommand.CommandText = movie.GetInsertQuery();
+                movie.AddParameters(insertCommand);
+                insertCommand.ExecuteNonQuery();
+
+                Console.WriteLine("Movie added successfully!");
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
     }
 }
